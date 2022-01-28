@@ -1,9 +1,13 @@
 <template>
-  <Tutorial/>
+  <div>{{name}}</div>
 </template>
 
 <script>
-export default {
-  name: 'IndexPage'
-}
+import { defineComponent } from '@nuxtjs/composition-api'
+
+export default defineComponent({
+  setup() {
+    return {name: 'ABC'}
+  }
+})
 </script>
