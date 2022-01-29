@@ -18,6 +18,7 @@
 
 <script>
 import { defineComponent, reactive, useFetch, computed } from '@nuxtjs/composition-api'
+import axios from 'axios'
 
 export default defineComponent({
   setup() {
@@ -32,10 +33,10 @@ export default defineComponent({
     };
 
     // TODO: 確認すること。useFetchはこの形で使われているのか。Nuxt3では動作がちがうっぽい。
-    // TODO: 確認すること。SSRは自動で？
+    // useFetchは静的化の為の処理。https://ics.media/entry/210120/
     const {$fetch, $fetchState} = useFetch(async () => {
-      const res = await fetch('http://localhost:3000/api/posts/1.json');
-      const {posts: newPosts} = await res.json();
+      const res = await axios.get('http://localhost:3000/api/posts/1.json');
+      const {posts: newPosts} = res.data
       
       console.log(newPosts);
       posts.splice(0, posts.length);
@@ -47,7 +48,7 @@ export default defineComponent({
     const reload = () => {
       $fetch();
     }
-
+    
     return {add, posts, remove, reload, isLoading: computed(() => $fetchState.pending)};
   }
 })
