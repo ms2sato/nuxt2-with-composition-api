@@ -17,39 +17,32 @@
 </template>
 
 <script>
-import { defineComponent, reactive, useFetch, computed } from '@nuxtjs/composition-api'
+import { defineComponent, reactive, useFetch, computed } from '@vue/composition-api'
 import axios from 'axios'
 
 export default defineComponent({
-  setup() {
-    const posts = reactive([]);
-    const add = () => {
+  async asyncData({params}) {
+    const res = await axios.get('http://localhost:3000/api/posts/1.json');
+    const {posts} = res.data;
+    return { posts, isLoading: false };
+  },
+
+  methods: {
+    add: function () {
       const now = Date.now();
-      posts.push({ id: now, title: `test${now}` });
-    };
-
-    const remove = (id) => {
-      posts.splice(posts.findIndex((post) => post.id === id), 1)
-    };
-
-    // TODO: 確認すること。useFetchはこの形で使われているのか。Nuxt3では動作がちがうっぽい。
-    // useFetchは静的化の為の処理。https://ics.media/entry/210120/
-    const {$fetch, $fetchState} = useFetch(async () => {
-      const res = await axios.get('http://localhost:3000/api/posts/1.json');
-      const {posts: newPosts} = res.data
-      
-      console.log(newPosts);
-      posts.splice(0, posts.length);
-      for(const post of newPosts) {
-        posts.push(post);
-      }
-    });
-
-    const reload = () => {
-      $fetch();
+      console.log('add:this.posts', this.posts);
+      this.posts.push({ id: now, title: `test${now}` });
+    },
+    remove: function (id) {
+      this.posts.splice(this.posts.findIndex((post) => post.id === id), 1)
     }
-    
-    return {add, posts, remove, reload, isLoading: computed(() => $fetchState.pending)};
+  },
+
+  setup(props) {
+    console.log('setup:props', props);
+    const posts = reactive([]);
+    console.log('setup:posts', posts);
+    return { posts };
   }
 })
 </script>
